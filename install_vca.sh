@@ -92,9 +92,15 @@ insert_after_last_match() {
     fi
 
     # Insert after the matched line
-    sed -i "${last_line}a\\
-$newline
-" "$file"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "${last_line}a\\
+    $newline
+    " "$file"
+    else
+        sed -i "${last_line}a\\
+    $newline
+    " "$file"
+    fi
 
     echo "Updated: ${file#$FFMPEG_DIR/}"
 }
