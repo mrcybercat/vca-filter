@@ -1,1 +1,0 @@
-X86ASM-OBJS-$(CONFIG_VCA_FILTER)             += x86/vf_vca.o x86/vf_vca_init.o
