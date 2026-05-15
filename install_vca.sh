@@ -61,7 +61,6 @@ cp "$SOURCE_LIBAVFILTER/vca_dct.c"            "$TARGET_LIBAVFILTER/"
 echo "Created: libavfilter/vca_dct.c"
 cp "$SOURCE_LIBAVFILTER/vf_vca.c"             "$TARGET_LIBAVFILTER/"
 echo "Created: libavfilter/vf_vca.c"
-
 insert_after_last_match() {
     local file="$1"
     local regex="$2"
@@ -91,13 +90,32 @@ insert_after_last_match() {
         exit 1
     fi
 
-# Insert after the matched line
+    # Handle multiline continuations ending with '\'
+    local insert_line="$last_line"
+    local total_lines
+    total_lines=$(wc -l < "$file")
+
+    while [[ "$insert_line" -lt "$total_lines" ]]; do
+        local current_line
+        current_line=$(sed -n "${insert_line}p" "$file")
+
+        # Remove trailing whitespace
+        current_line="${current_line%"${current_line##*[![:space:]]}"}"
+
+        # Continue while line ends with '\'
+        if [[ "$current_line" == *\\ ]]; then
+            ((insert_line++))
+        else
+            break
+        fi
+    done
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' "${last_line}a\\
+    sed -i '' "${insert_line}a\\
 $newline
 " "$file"
 else
-    sed -i "${last_line}a\\
+    sed -i "${insert_line}a\\
 $newline
 " "$file"
 fi
